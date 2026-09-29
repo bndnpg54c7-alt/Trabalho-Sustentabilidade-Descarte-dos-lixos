@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menos Plástico, Mais Vida - HQ Interativa</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        comicDark: '#1a1a24',
+                        comicYellow: '#fef08a',
+                        comicGreen: '#10b981',
+                        comicGreenDark: '#047857',
+                        comicBlue: '#0284c7',
+                        comicAccent: '#f43f5e',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        comic: ['Bangers', 'cursive', 'sans-serif'],
+                        speech: ['Comic Neue', 'cursive', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Fonts Import -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Custom Comic Book Styling & Animations */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .font-comic {
+            font-family: 'Bangers', cursive, sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .font-speech {
+            font-family: 'Comic Neue', cursive, sans-serif;
+        }
+
+        /* Speech Bubble Styling */
+        .speech-bubble {
+            position: relative;
+            background: #ffffff;
+            border: 4px solid #000000;
+            border-radius: 18px;
+            color: #000000;
+            padding: 16px 20px;
+            box-shadow: 6px 6px 0px rgba(0,0,0,0.8);
+            transition: all 0.3s ease;
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 30px;
+            border-width: 20px 20px 0;
+            border-style: solid;
+            border-color: #ffffff transparent;
+            display: block;
+            width: 0;
+        }
+
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -26px;
+            left: 28px;
+            border-width: 23px 22px 0;
+            border-style: solid;
+            border-color: #000000 transparent;
+            display: block;
+            width: 0;
+        }
+
+        .speech-bubble-right::after {
+            left: auto;
+            right: 30px;
+        }
+
+        .speech-bubble-right::before {
+            left: auto;
+            right: 28px;
+        }
+
+        /* Comic Panel Frame Styling */
+        .comic-panel {
+            border: 6px solid #000000;
+            box-shadow: 10px 10px 0px #000000;
+            background-color: #1e293b;
+            transition: transform 0.4s ease, opacity 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Hotspot Pulse Effect */
+        .hotspot-btn {
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+
+        /* Halftone Dot Pattern Background for Comic Effect */
+        .halftone-bg {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 15%, transparent 16%);
+            background-size: 16px 16px;
+        }
+
+        .halftone-dark {
+            background-image: radial-gradient(rgba(0, 0, 0, 0.3) 15%, transparent 16%);
+            background-size: 16px 16px;
+        }
+
+        /* On scroll fade-in class */
+        .panel-hidden {
+            opacity: 0;
+            transform: translateY(60px);
+        }
+
+        .panel-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #10b981;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body class="halftone-bg min-h-screen">
+
+    <!-- Header Fixo & Controles de Áudio -->
+    <header class="fixed top-0 left-0 w-full z-50 bg-slate-900/90 backdrop-blur-md border-b-4 border-black px-4 py-3 shadow-lg">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-emerald-500 text-black px-3 py-1 font-comic text-xl rounded border-2 border-black -rotate-2">
+                    HQ INTERATIVA
+                </div>
+                <h1 class="font-comic text-2xl md:text-3xl text-yellow-300 tracking-wide hidden sm:block">
+                    Menos Plástico, Mais Vida
+                </h1>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <!-- Sound Effect Switch -->
+                <button id="soundToggle" onclick="toggleAudio()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-yellow-300 border-2 border-black px-3 py-1.5 rounded-lg text-sm font-bold transition">
+                    <i id="soundIcon" class="fa-solid fa-volume-xmark text-rose-500"></i>
+                    <span id="soundText" class="hidden md:inline">Sons: Desligados</span>
+                </button>
+
+                <!-- Navigation Quick Links -->
+                <a href="#calculadora" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-3 py-1.5 rounded-lg border-2 border-black text-sm transition">
+                    <i class="fa-solid fa-calculator"></i> <span class="hidden sm:inline">Calculadora</span>
+                </a>
+                <a href="#quiz" class="bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-3 py-1.5 rounded-lg border-2 border-black text-sm transition">
+                    <i class="fa-solid fa-graduation-cap"></i> <span class="hidden sm:inline">Quiz</span>
+                </a>
+            </div>
+        </div>
+        <!-- Progress Bar -->
+        <div id="scrollProgress" class="h-1.5 bg-emerald-500 w-0 transition-all duration-150 absolute bottom-0 left-0"></div>
+    </header>
+
+    <!-- Hero / Capa Principal -->
+    <section class="pt-28 pb-16 px-4 max-w-4xl mx-auto text-center">
+        <div class="relative inline-block mb-6">
+            <span class="bg-rose-500 text-white font-comic text-lg uppercase px-4 py-1 rounded-full border-2 border-black uppercase shadow-md -top-4 left-1/2 -translate-x-1/2 absolute">
+                Conscientização Ambiental
+            </span>
+            <h1 class="font-comic text-5xl md:text-7xl text-yellow-300 drop-shadow-[0_5px_0_rgba(0,0,0,1)] tracking-wider mt-4">
+                MENOS PLÁSTICO, MAIS VIDA!
+            </h1>
+        </div>
+        <p class="font-speech text-xl md:text-2xl text-slate-200 max-w-2xl mx-auto mb-8 bg-slate-800/80 p-4 rounded-xl border-2 border-black shadow-lg">
+            Role para baixo e acompanhe a história do impacto silencioso dos plásticos descartáveis no nosso dia a dia e descubra como mudar esse cenário! 📜👇
+        </p>
+        
+        <div class="animate-bounce">
+            <i class="fa-solid fa-angles-down text-4xl text-emerald-400"></i>
+        </div>
+    </section>
+
+    <!-- WEBTOON NARRATIVE PANELS SECTION -->
+    <main class="max-w-4xl mx-auto px-4 space-y-20 pb-16">
+
+        <!-- CENA 1: Escola -->
+        <section class="comic-panel panel-hidden rounded-2xl p-6 halftone-dark" id="scene-1">
+            <div class="flex justify-between items-center mb-4">
+                <span class="bg-amber-400 text-black font-comic text-xl px-3 py-1 rounded border-2 border-black">
+                    CENA 1: NA ESCOLA
+                </span>
+                <!-- Hotspot Button -->
+                <button onclick="openModal('modal-copo')" class="hotspot-btn bg-rose-500 hover:bg-rose-600 text-white font-bold px-3 py-1.5 rounded-full border-2 border-black text-xs md:text-sm flex items-center gap-2 transition">
+                    <i class="fa-solid fa-magnifying-glass"></i> Saiba Mais
+                </button>
+            </div>
+
+            <!-- Balloon Speech -->
+            <div class="speech-bubble mb-6 font-speech text-lg md:text-xl font-bold">
+                <p>"Na escola, é rápido. Um copo de plástico para água, e pronto. Depois de alguns minutos, já virou lixo."</p>
+            </div>
+
+            <!-- Illustration Container (SVG) -->
+            <div class="w-full h-80 md:h-96 bg-slate-800 rounded-xl border-4 border-black relative flex items-center justify-center overflow-hidden">
+                <!-- Background Cafeteria SVG Scene -->
+                <svg viewBox="0 0 800 450" class="w-full h-full object-cover">
+                    <rect width="800" height="450" fill="#2d3748"/>
+                    <!-- Windows and cafeteria tables -->
+                    <rect x="50" y="30" width="200" height="150" fill="#4a5568" stroke="#1a202c" stroke-width="4"/>
+                    <rect x="300" y="30" width="200" height="150" fill="#4a5568" stroke="#1a202c" stroke-width="4"/>
+                    <rect x="550" y="30" width="200" height="150" fill="#4a5568" stroke="#1a202c" stroke-width="4"/>
+                    <line x1="0" y1="280" x2="800" y2="280" stroke="#1a202c" stroke-width="8"/>
+                    <!-- Table -->
+                    <polygon points="100,320 700,320 750,450 50,450" fill="#718096" stroke="#000" stroke-width="4"/>
+                    <!-- Student Figure -->
+                    <circle cx="300" cy="210" r="45" fill="#fbd38d" stroke="#000" stroke-width="4"/> <!-- Head -->
+                    <path d="M 260 210 Q 300 160 340 210 Z" fill="#1a202c"/> <!-- Hair -->
+                    <path d="M 240 320 C 240 250, 360 250, 360 320 Z" fill="#4299e1" stroke="#000" stroke-width="4"/> <!-- Body hoodie -->
+                    <!-- Plastic Cup in Hand -->
+                    <polygon points="340,240 370,240 365,280 345,280" fill="#e2e8f0" opacity="0.9" stroke="#000" stroke-width="3"/>
+                    <!-- Overflowing Trash Can -->
+                    <rect x="580" y="270" width="120" height="160" fill="#e2e8f0" stroke="#000" stroke-width="5" rx="8"/>
+                    <text x="615" y="360" font-family="Bangers" font-size="32" fill="#e53e3e">LIXO</text>
+                    <!-- Cups in trash -->
+                    <polygon points="600,240 630,240 625,270 605,270" fill="#edf2f7" stroke="#000" stroke-width="2" transform="rotate(25 615 255)"/>
+                    <polygon points="640,250 670,250 665,280 645,280" fill="#edf2f7" stroke="#000" stroke-width="2" transform="rotate(-15 655 265)"/>
+                    <polygon points="610,220 640,220 635,250 615,250" fill="#edf2f7" stroke="#000" stroke-width="2" transform="rotate(45 625 235)"/>
+                </svg>
+            </div>
+        </section>
+
+        <!-- CENA 2: Supermercado -->
+        <section class="comic-panel panel-hidden rounded-2xl p-6 halftone-dark" id="scene-2">
+            <div class="flex justify-between items-center mb-4">
+                <span class="bg-amber-400 text-black font-comic text-xl px-3 py-1 rounded border-2 border-black">
+                    CENA 2: NO SUPERMERCADO
+                </span>
+                <!-- Hotspot Button -->
+                <button onclick="openModal('modal-sacola')" class="hotspot-btn bg-rose-500 hover:bg-rose-600 text-white font-bold px-3 py-1.5 rounded-full border-2 border-black text-xs md:text-sm flex items-center gap-2 transition">
+                    <i class="fa-solid fa-magnifying-glass"></i> Saiba Mais
+                </button>
+            </div>
+
+            <!-- Balloon Speech -->
+            <div class="speech-bubble speech-bubble-right mb-6 font-speech text-lg md:text-xl font-bold">
+                <p>"No supermercado, a sacola de plástico leva suas compras para casa. Mas muitas vezes, acaba no lixo em questão de minutos."</p>
+            </div>
+
+            <!-- Illustration Container (SVG) -->
+            <div class="w-full h-80 md:h-96 bg-slate-800 rounded-xl border-4 border-black relative flex items-center justify-center overflow-hidden">
+                <svg viewBox="0 0 800 450" class="w-full h-full object-cover">
+                    <rect width="800" height="450" fill="#1a202c"/>
+                    <!-- Supermarket Shelves background -->
+                    <rect x="40" y="40" width="720" height="180" fill="#2d3748" stroke="#000" stroke-width="4"/>
+                    <line x1="40" y1="100" x2="760" y2="100" stroke="#4a5568" stroke-width="6"/>
+                    <line x1="40" y1="150" x2="760" y2="150" stroke="#4a5568" stroke-width="6"/>
+                    <!-- Shelf items -->
+                    <rect x="80" y="60" width="30" height="35" fill="#f6e05e"/><rect x="120" y="60" width="25" height="35" fill="#f56565"/>
+                    <rect x="180" y="110" width="40" height="35" fill="#4299e1"/><rect x="230" y="110" width="30" height="35" fill="#48bb78"/>
+                    <!-- Supermarket Sale Sign -->
+                    <rect x="580" y="60" width="140" height="60" fill="#e53e3e" stroke="#000" stroke-width="3" transform="rotate(5 650 90)"/>
+                    <text x="600" y="100" font-family="Bangers" font-size="28" fill="#fff">OFERTA</text>
+                    <!-- Hand holding plastic bag -->
+                    <path d="M 200 450 L 250 280 C 270 280, 290 300, 280 340 Z" fill="#ed8936" stroke="#000" stroke-width="4"/>
+                    <!-- Plastic Bag -->
+                    <path d="M 250 300 C 220 320 200 370 230 430 C 270 450 380 440 370 380 C 360 330 320 300 290 300 Z" fill="#edf2f7" opacity="0.9" stroke="#000" stroke-width="4"/>
+                    <ellipse cx="290" cy="320" rx="20" ry="10" fill="#cbd5e0" stroke="#000" stroke-width="2"/> <!-- bag handle cutout -->
+                    <!-- Trash bin with bags overflowing -->
+                    <rect x="520" y="240" width="180" height="200" fill="#4a5568" stroke="#000" stroke-width="5"/>
+                    <path d="M 490 240 Q 610 180 730 240 Z" fill="#cbd5e0" stroke="#000" stroke-width="3"/> <!-- Overflowing plastic bags -->
+                    <circle cx="580" cy="220" r="25" fill="#e2e8f0" opacity="0.8"/>
+                    <circle cx="630" cy="200" r="30" fill="#e2e8f0" opacity="0.8"/>
+                </svg>
+            </div>
+        </section>
+
+        <!-- CENA 3: Delivery -->
+        <section class="comic-panel panel-hidden rounded-2xl p-6 halftone-dark" id="scene-3">
+            <div class="flex justify-between items-center mb-4">
+                <span class="bg-amber-400 text-black font-comic text-xl px-3 py-1 rounded border-2 border-black">
+                    CENA 3: NO DELIVERY
+                </span>
+                <!-- Hotspot Button -->
+                <button onclick="openModal('modal-delivery')" class="hotspot-btn bg-rose-500 hover:bg-rose-600 text-white font-bold px-3 py-1.5 rounded-full border-2 border-black text-xs md:text-sm flex items-center gap-2 transition">
+                    <i class="fa-solid fa-magnifying-glass"></i> Saiba Mais
+                </button>
+            </div>
+
+            <!-- Balloon Speech -->
+            <div class="speech-bubble mb-6 font-speech text-lg md:text-xl font-bold">
+                <p>"No delivery, o copo, o talher e a embalagem plástica chegam com a comida e também viram lixo em minutos."</p>
+            </div>
+
+            <!-- Illustration Container (SVG) -->
+            <div class="w-full h-80 md:h-96 bg-slate-800 rounded-xl border-4 border-black relative flex items-center justify-center overflow-hidden">
+                <svg viewBox="0 0 800 450" class="w-full h-full object-cover">
+                    <rect width="800" height="450" fill="#2d3748"/>
+                    <!-- Wooden Table Surface -->
+                    <polygon points="0,200 800,200 800,450 0,450" fill="#744210" stroke="#000" stroke-width="5"/>
+                    <!-- Styrofoam / Plastic Food Container -->
+                    <rect x="350" y="240" width="220" height="120" rx="15" fill="#edf2f7" stroke="#000" stroke-width="4"/>
+                    <line x1="350" y1="280" x2="570" y2="280" stroke="#cbd5e0" stroke-width="4"/> <!-- Container lid separation -->
+                    <!-- Plastic Cup with Straw -->
+                    <polygon points="180,220 250,220 235,360 195,360" fill="#e2e8f0" opacity="0.85" stroke="#000" stroke-width="4"/>
+                    <line x1="215" y1="180" x2="225" y2="230" stroke="#e53e3e" stroke-width="8" stroke-linecap="round"/> <!-- Straw -->
+                    <!-- Disposable Plastic Cutlery -->
+                    <path d="M 280 380 L 380 380 L 370 395 L 280 390 Z" fill="#e2e8f0" stroke="#000" stroke-width="3"/> <!-- Fork/Knife -->
+                    <path d="M 300 405 L 400 405 L 390 420 L 300 415 Z" fill="#e2e8f0" stroke="#000" stroke-width="3"/>
+                    <!-- Delivery Bag in Background -->
+                    <path d="M 580 180 L 720 180 L 750 360 L 560 360 Z" fill="#dd6b20" stroke="#000" stroke-width="4"/>
+                    <path d="M 630 180 C 630 140, 670 140, 670 180" fill="none" stroke="#000" stroke-width="5"/> <!-- Paper bag handle -->
+                </svg>
+            </div>
+        </section>
+
+        <!-- CENA 4: Decomposição -->
+        <section class="comic-panel panel-hidden rounded-2xl p-6 halftone-dark" id="scene-4">
+            <div class="flex justify-between items-center mb-4">
+                <span class="bg-sky-400 text-black font-comic text-xl px-3 py-1 rounded border-2 border-black">
+                    CENA 4: DECOMPOSIÇÃO NO OCEANO
+                </span>
+                <!-- Hotspot Button -->
+                <button onclick="openModal('modal-decomposicao')" class="hotspot-btn bg-rose-500 hover:bg-rose-600 text-white font-bold px-3 py-1.5 rounded-full border-2 border-black text-xs md:text-sm flex items-center gap-2 transition">
+                    <i class="fa-solid fa-magnifying-glass"></i> Saiba Mais
+                </button>
+            </div>
+
+            <!-- Balloon Speech -->
+            <div class="speech-bubble speech-bubble-right mb-6 font-speech text-lg md:text-xl font-bold">
+                <p>"O que parece algo simples dura muito mais do que imaginamos. O plástico descartável pode levar até 400 anos para se decompor."</p>
+            </div>
+
+            <!-- Illustration Container (SVG) - Underwater Turtle & Plastic -->
+            <div class="w-full h-80 md:h-96 bg-slate-800 rounded-xl border-4 border-black relative flex items-center justify-center overflow-hidden">
+                <svg viewBox="0 0 800 450" class="w-full h-full object-cover">
+                    <!-- Deep Ocean Gradient Background -->
+                    <defs>
+                        <linearGradient id="oceanGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#0284c7;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#0f172a;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <rect width="800" height="450" fill="url(#oceanGrad)"/>
+
+                    <!-- Sun rays in ocean -->
+                    <polygon points="100,0 200,0 400,450 150,450" fill="#ffffff" opacity="0.1"/>
+                    <polygon points="400,0 550,0 700,450 500,450" fill="#ffffff" opacity="0.08"/>
+
+                    <!-- Sea Turtle -->
+                    <g transform="translate(480, 120)">
+                        <ellipse cx="100" cy="60" rx="70" ry="50" fill="#2f855a" stroke="#000" stroke-width="4"/> <!-- Shell -->
+                        <circle cx="180" cy="50" r="22" fill="#276749" stroke="#000" stroke-width="3"/> <!-- Head -->
+                        <path d="M 120 20 C 150 -30, 200 -10, 150 30 Z" fill="#2f855a" stroke="#000" stroke-width="3"/> <!-- Flipper 1 -->
+                        <path d="M 120 100 C 150 150, 200 130, 150 90 Z" fill="#276749" stroke="#000" stroke-width="3"/> <!-- Flipper 2 -->
+                    </g>
+
+                    <!-- Floating Floating Plastic Cup & Bottles in ocean -->
+                    <g transform="translate(180, 200) rotate(-20)">
+                        <polygon points="0,0 70,0 60,110 10,110" fill="#e2e8f0" opacity="0.8" stroke="#000" stroke-width="4"/>
+                        <ellipse cx="35" cy="0" rx="35" ry="10" fill="#cbd5e0" stroke="#000" stroke-width="2"/>
+                    </g>
+                    <g transform="translate(320, 310) rotate(35)">
+                        <rect x="0" y="0" width="40" height="90" rx="10" fill="#38bdf8" opacity="0.7" stroke="#000" stroke-width="3"/>
+                        <rect x="12" y="-15" width="16" height="15" fill="#0284c7" stroke="#000" stroke-width="2"/>
+                    </g>
+
+                    <!-- Comic Box Overlay: 400 ANOS -->
+                    <rect x="520" y="280" width="240" height="120" fill="#000000" opacity="0.85" rx="10" stroke="#38bdf8" stroke-width="4"/>
+                    <text x="540" y="320" font-family="Bangers" font-size="22" fill="#ffffff">COPOS, SACOLAS, EMBALAGENS...</text>
+                    <text x="540" y="360" font-family="Bangers" font-size="38" fill="#38bdf8">ATÉ 400 ANOS</text>
+                    <text x="540" y="388" font-family="Bangers" font-size="20" fill="#ffffff">PARA SE DECOMPOR</text>
+                </svg>
+            </div>
+        </section>
+
+        <!-- CENA 5: Impacto Ambiental -->
+        <section class="comic-panel panel-hidden rounded-2xl p-6 halftone-dark" id="scene-5">
+            <div class="flex justify-between items-center mb-4">
+                <span class="bg-rose-500 text-white font-comic text-xl px-3 py-1 rounded border-2 border-black">
+                    CENA 5: IMPACTO AMBIENTAL
+                </span>
+                <!-- Hotspot Button -->
+                <button onclick="openModal('modal-impacto')" class="hotspot-btn bg-yellow-400 hover:bg-yellow-500 text-black font-bold px-3 py-1.5 rounded-full border-2 border-black text-xs md:text-sm flex items-center gap-2 transition">
+                    <i class="fa-solid fa-magnifying-glass"></i> Saiba Mais
+                </button>
+            </div>
+
+            <!-- Balloon Speech -->
+            <div class="speech-bubble mb-6 font-speech text-lg md:text-xl font-bold">
+                <p>"E enquanto isso, o plástico se acumula em rios, oceanos, solo e até na comida que a gente consome."</p>
+            </div>
+
+            <!-- Illustration Container (SVG) - Polluted River at Sunset -->
+            <div class="w-full h-80 md:h-96 bg-slate-800 rounded-xl border-4 border-black relative flex items-center justify-center overflow-hidden">
+                <svg viewBox="0 0 800 450" class="w-full h-full object-cover">
+                    <!-- Sunset Sky Gradient -->
+                    <defs>
+                        <linearGradient id="sunsetGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#dd6b20;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#e53e3e;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#312e81;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <rect width="800" height="450" fill="url(#sunsetGrad)"/>
+
+                    <!-- Sun setting -->
+                    <circle cx="400" cy="220" r="60" fill="#fef08a" opacity="0.9"/>
+
+                    <!-- City Skyline Silhouette -->
+                    <polygon points="0,220 50,220 50,180 90,180 90,220 180,220 180,150 240,150 240,220 600,220 640,170 700,170 700,220 800,220 800,450 0,450" fill="#1e1b4b"/>
+
+                    <!-- Polluted River Front -->
+                    <path d="M 0 280 C 300 260, 500 310, 800 270 L 800 450 L 0 450 Z" fill="#431407" stroke="#000" stroke-width="4"/>
+
+                    <!-- Trash mounds on riverbanks -->
+                    <ellipse cx="150" cy="380" rx="140" ry="50" fill="#78350f"/>
+                    <ellipse cx="600" cy="390" rx="200" ry="60" fill="#78350f"/>
+
+                    <!-- Plastic Bottles and debris on riverbank -->
+                    <rect x="120" y="350" width="25" height="50" rx="5" fill="#ef4444" transform="rotate(40 120 350)"/>
+                    <rect x="180" y="360" width="20" height="45" rx="5" fill="#3b82f6" transform="rotate(-25 180 360)"/>
+                    <rect x="520" y="370" width="30" height="60" rx="5" fill="#e2e8f0" transform="rotate(70 520 370)"/>
+                    <circle cx="620" cy="380" r="18" fill="#f59e0b"/>
+                    <polygon points="560,340 590,340 580,370 550,370" fill="#ec4899"/>
+                </svg>
+            </div>
+        </section>
+
+        <!-- CENA 6: Solução & Reflexão -->
+        <section class="comic-panel panel-hidden rounded-2xl p-6 bg-emerald-950/80 border-emerald-500" id="scene-6">
+            <div class="flex justify-between items-center mb-4">
+                <span class="bg-emerald-400 text-black font-comic text-xl px-3 py-1 rounded border-2 border-black">
+                    CENA 6: SOLUÇÃO & REFLEXÃO
+                </span>
+                <!-- Hotspot Button -->
+                <button onclick="openModal('modal-solucao')" class="hotspot-btn bg-emerald-400 hover:bg-emerald-300 text-black font-bold px-3 py-1.5 rounded-full border-2 border-black text-xs md:text-sm flex items-center gap-2 transition">
+                    <i class="fa-solid fa-magnifying-glass"></i> Saiba Mais
+                </button>
+            </div>
+
+            <!-- Balloon Speech -->
+            <div class="speech-bubble mb-6 font-speech text-lg md:text-xl font-bold bg-emerald-50 border-emerald-900">
+                <p>"O problema não é só o plástico. É o nosso hábito. Reduza. Reutilize. Use o que precisa. O futuro também depende das suas escolhas. <span class="text-emerald-700 font-black">Menos Plástico, Mais Vida!</span>"</p>
+            </div>
+
+            <!-- Illustration Container (SVG) - Sustainable Alternatives -->
+            <div class="w-full h-80 md:h-96 bg-slate-900 rounded-xl border-4 border-black relative flex items-center justify-center overflow-hidden">
+                <svg viewBox="0 0 800 450" class="w-full h-full object-cover">
+                    <!-- Bright Sunny Background -->
+                    <rect width="800" height="450" fill="#065f46"/>
+                    <circle cx="700" cy="80" r="120" fill="#fef08a" opacity="0.3"/>
+
+                    <!-- Eco Bag (Cloth Bag) -->
+                    <g transform="translate(420, 100)">
+                        <!-- Straps -->
+                        <path d="M 60 50 C 60 -20, 160 -20, 160 50" fill="none" stroke="#d97706" stroke-width="12"/>
+                        <!-- Bag Body -->
+                        <path d="M 30 50 L 190 50 L 210 280 C 210 300, 10 300, 10 280 Z" fill="#fef3c7" stroke="#000" stroke-width="5"/>
+                        <!-- Leaf Badge on Bag -->
+                        <path d="M 110 120 C 70 160, 110 220, 110 220 C 110 220, 150 160, 110 120 Z" fill="#059669"/>
+                        <text x="50" y="260" font-family="Comic Neue" font-weight="bold" font-size="16" fill="#78350f">Pequenas ações movem o mundo!</text>
+                    </g>
+
+                    <!-- Stainless Steel Water Bottle -->
+                    <g transform="translate(220, 120)">
+                        <rect x="40" y="80" width="80" height="220" rx="20" fill="#475569" stroke="#000" stroke-width="5"/> <!-- Bottle main -->
+                        <rect x="55" y="40" width="50" height="40" rx="5" fill="#0f172a" stroke="#000" stroke-width="4"/> <!-- Cap lid -->
+                        <path d="M 65 15 C 65 0, 95 0, 95 15" fill="none" stroke="#0f172a" stroke-width="6"/> <!-- Loop handle -->
+                        <!-- Metallic highlight -->
+                        <rect x="55" y="90" width="12" height="200" rx="5" fill="#94a3b8" opacity="0.5"/>
+                    </g>
+
+                    <!-- Eco Icons Row at Bottom -->
+                    <g transform="translate(150, 360)">
+                        <!-- Avoid Single-use -->
+                        <circle cx="50" cy="30" r="30" fill="#ef4444" stroke="#000" stroke-width="3"/>
+                        <text x="50" y="38" font-family="Bangers" font-size="24" text-anchor="middle" fill="#fff">🚫</text>
+
+                        <!-- Reuse -->
+                        <circle cx="250" cy="30" r="30" fill="#10b981" stroke="#000" stroke-width="3"/>
+                        <text x="250" y="38" font-family="Bangers" font-size="24" text-anchor="middle" fill="#fff">♻️</text>
+
+                        <!-- Recycle -->
+                        <circle cx="450" cy="30" r="30" fill="#3b82f6" stroke="#000" stroke-width="3"/>
+                        <text x="450" y="38" font-family="Bangers" font-size="24" text-anchor="middle" fill="#fff">🌱</text>
+                    </g>
+                </svg>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- INTERACTIVE PLASTIC FOOTPRINT CALCULATOR -->
+    <section id="calculadora" class="max-w-4xl mx-auto px-4 py-12 mb-16">
+        <div class="bg-slate-800 border-4 border-black rounded-3xl p-6 md:p-10 shadow-2xl halftone-bg relative">
+            <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-yellow-400 text-black font-comic text-2xl md:text-3xl px-6 py-2 rounded-full border-4 border-black shadow-lg">
+                📊 CALCULADORA DE PEGADA DE PLÁSTICO
+            </div>
+
+            <p class="text-center text-slate-300 font-speech text-lg md:text-xl mt-6 mb-8">
+                Descubra quanto lixo plástico descartável o seu consumo diário pode gerar ao longo de um ano inteiro!
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Input 1: Copos -->
+                <div class="bg-slate-900 border-2 border-black p-5 rounded-2xl flex flex-col justify-between">
+                    <label class="font-comic text-xl text-yellow-300 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-glass-water text-sky-400"></i> Copos / Semana
+                    </label>
+                    <input type="number" id="calc-copos" min="0" value="7" oninput="calcularPegada()" class="w-full bg-slate-800 border-2 border-slate-600 rounded-lg p-3 text-2xl font-bold text-center text-white focus:border-yellow-400 outline-none">
+                    <span class="text-xs text-slate-400 mt-2 text-center">Usados na escola, trabalho ou academia</span>
+                </div>
+
+                <!-- Input 2: Sacolas -->
+                <div class="bg-slate-900 border-2 border-black p-5 rounded-2xl flex flex-col justify-between">
+                    <label class="font-comic text-xl text-yellow-300 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-bag-shopping text-emerald-400"></i> Sacolas / Semana
+                    </label>
+                    <input type="number" id="calc-sacolas" min="0" value="5" oninput="calcularPegada()" class="w-full bg-slate-800 border-2 border-slate-600 rounded-lg p-3 text-2xl font-bold text-center text-white focus:border-yellow-400 outline-none">
+                    <span class="text-xs text-slate-400 mt-2 text-center">Mercado, padaria e feiras</span>
+                </div>
+
+                <!-- Input 3: Delivery -->
+                <div class="bg-slate-900 border-2 border-black p-5 rounded-2xl flex flex-col justify-between">
+                    <label class="font-comic text-xl text-yellow-300 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-utensils text-rose-400"></i> Delivery / Semana
+                    </label>
+                    <input type="number" id="calc-delivery" min="0" value="3" oninput="calcularPegada()" class="w-full bg-slate-800 border-2 border-slate-600 rounded-lg p-3 text-2xl font-bold text-center text-white focus:border-yellow-400 outline-none">
+                    <span class="text-xs text-slate-400 mt-2 text-center">Embalagens, copos e talheres de entrega</span>
+                </div>
+            </div>
+
+            <!-- Results Display Box -->
+            <div class="bg-amber-400 border-4 border-black text-black rounded-2xl p-6 shadow-md text-center">
+                <h3 class="font-comic text-2xl uppercase mb-4">Seu Impacto Estimado em 1 Ano:</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-bold">
+                    <div class="bg-white p-4 rounded-xl border-2 border-black">
+                        <span id="res-total-itens" class="block font-comic text-4xl text-rose-600">780</span>
+                        <span class="text-sm">Itens plásticos descartados</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border-2 border-black">
+                        <span id="res-peso-kg" class="block font-comic text-4xl text-amber-600">6.2 kg</span>
+                        <span class="text-sm">Peso total aproximado</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border-2 border-black">
+                        <span id="res-anos-decomp" class="block font-comic text-4xl text-emerald-600">400 Anos</span>
+                        <span class="text-sm">Tempo no meio ambiente</span>
+                    </div>
+                </div>
+
+                <p id="res-mensagem" class="font-speech text-lg font-bold mt-4 text-slate-900">
+                    💡 Dica: Substituir copos e sacolas por itens reutilizáveis evita centenas de resíduos por ano!
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- INTERACTIVE MINI-QUIZ SECTION -->
+    <section id="quiz" class="max-w-4xl mx-auto px-4 py-12 mb-16">
+        <div class="bg-slate-800 border-4 border-black rounded-3xl p-6 md:p-10 shadow-2xl halftone-bg relative">
+            <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-emerald-400 text-black font-comic text-2xl md:text-3xl px-6 py-2 rounded-full border-4 border-black shadow-lg">
+                🏆 QUIZ: HERÓI SEM PLÁSTICO
+            </div>
+
+            <div id="quiz-container" class="mt-6">
+                <!-- Question Block dynamically injected via JS or state -->
+                <div id="quiz-step">
+                    <div class="flex justify-between items-center mb-4">
+                        <span id="quiz-progress-text" class="text-yellow-400 font-bold font-comic text-lg">Pergunta 1 de 3</span>
+                        <span id="quiz-score-badge" class="bg-slate-700 text-emerald-300 font-bold px-3 py-1 rounded-full text-sm border border-slate-500">Pontos: 0</span>
+                    </div>
+
+                    <h3 id="quiz-question" class="font-comic text-2xl md:text-3xl text-white mb-6">
+                        Quanto tempo um copo plástico descartável pode levar para se decompor na natureza?
+                    </h3>
+
+                    <div id="quiz-options" class="grid grid-cols-1 gap-4 font-speech text-lg">
+                        <!-- Options generated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Quiz Result Certificate Box (hidden initially) -->
+                <div id="quiz-result" class="hidden text-center py-6">
+                    <div class="bg-gradient-to-br from-emerald-600 to-teal-800 border-4 border-yellow-300 rounded-2xl p-8 text-white shadow-2xl max-w-xl mx-auto relative">
+                        <div class="text-6xl mb-2">🛡️</div>
+                        <h3 class="font-comic text-4xl text-yellow-300 mb-2">CERTIFICADO ECOLÓGICO</h3>
+                        <p class="font-speech text-xl mb-4">Você foi nomeado:</p>
+                        <div id="quiz-rank" class="font-comic text-3xl md:text-4xl bg-yellow-400 text-black py-2 px-6 rounded-full border-2 border-black inline-block mb-4">
+                            GUARDIÃO DOS OCEANOS
+                        </div>
+                        <p id="quiz-final-desc" class="font-speech text-lg mb-6">
+                            Você demonstrou grande conhecimento sobre reciclagem e redução de plásticos!
+                        </p>
+                        <button onclick="compartilharCertificado()" class="bg-amber-400 hover:bg-amber-300 text-black font-bold px-6 py-3 rounded-xl border-2 border-black font-comic text-xl transition transform hover:scale-105">
+                            <i class="fa-solid fa-share-nodes"></i> Compartilhar Conquista
+                        </button>
+                        <button onclick="reiniciarQuiz()" class="ml-2 bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-3 rounded-xl border-2 border-black text-sm transition">
+                            Refazer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMMITMENT WALL / MURAL DE COMPROMISSO -->
+    <section class="max-w-4xl mx-auto px-4 py-12 mb-20">
+        <div class="bg-emerald-900/90 border-4 border-black rounded-3xl p-6 md:p-10 shadow-2xl halftone-bg text-center">
+            <h2 class="font-comic text-4xl text-yellow-300 mb-4 drop-shadow-[0_3px_0_rgba(0,0,0,1)]">
+                ✍️ MURAL DE COMPROMISSO SUSTENTÁVEL
+            </h2>
+            <p class="font-speech text-xl text-emerald-100 max-w-2xl mx-auto mb-8">
+                Junte-se a centenas de pessoas que se comprometeram a reduzir o plástico descartável nesta semana!
+            </p>
+
+            <!-- Counter Box -->
+            <div class="bg-black/60 border-2 border-emerald-400 rounded-2xl p-6 max-w-md mx-auto mb-8">
+                <span class="block text-emerald-400 font-speech text-sm uppercase font-bold tracking-wider mb-1">Apoiadores Registrados</span>
+                <span id="counter-commitments" class="font-comic text-6xl text-yellow-300">1,248</span>
+                <span class="block text-slate-300 text-xs mt-2">Pessoas dispostas a fazer a diferença</span>
+            </div>
+
+            <!-- Signature Form -->
+            <form id="form-commitment" onsubmit="assinarCompromisso(event)" class="max-w-md mx-auto flex flex-col sm:flex-row gap-3">
+                <input type="text" id="input-nome" placeholder="Digite seu nome..." required class="flex-1 bg-slate-800 border-2 border-black rounded-xl p-3 text-white font-bold placeholder-slate-400 outline-none focus:border-yellow-300">
+                <button type="submit" class="bg-yellow-400 hover:bg-yellow-300 text-black font-comic text-xl px-6 py-3 rounded-xl border-2 border-black transition transform active:scale-95 shadow-md">
+                    Assinar Agora!
+                </button>
+            </form>
+
+            <!-- Recent Signatures Cloud -->
+            <div class="mt-8 pt-6 border-t border-emerald-700/60">
+                <p class="text-sm font-bold text-emerald-200 mb-3 uppercase tracking-wider">Últimos Compromissos Firmados:</p>
+                <div id="recent-names" class="flex flex-wrap justify-center gap-2">
+                    <span class="bg-emerald-800 text-yellow-200 px-3 py-1 rounded-full text-xs font-bold border border-emerald-600">Ana Silva 🌿</span>
+                    <span class="bg-emerald-800 text-yellow-200 px-3 py-1 rounded-full text-xs font-bold border border-emerald-600">Lucas M. 🐢</span>
+                    <span class="bg-emerald-800 text-yellow-200 px-3 py-1 rounded-full text-xs font-bold border border-emerald-600">Beatriz G. 🌊</span>
+                    <span class="bg-emerald-800 text-yellow-200 px-3 py-1 rounded-full text-xs font-bold border border-emerald-600">Carlos R. 🛍️</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 border-t-4 border-black py-8 text-center text-slate-400 font-speech">
+        <p class="text-lg text-yellow-300 font-comic mb-2">MENOS PLÁSTICO, MAIS VIDA</p>
+        <p class="text-sm">Projeto Educativo de Conscientização Ambiental © 2026</p>
+    </footer>
+
+    <!-- MODAL CONTAINERS FOR HOTSPOTS -->
+
+    <!-- Modal Copo (Cena 1) -->
+    <div id="modal-copo" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-slate-800 border-4 border-black rounded-2xl max-w-lg w-full p-6 relative shadow-2xl halftone-bg">
+            <button onclick="closeModal('modal-copo')" class="absolute top-4 right-4 bg-rose-500 text-white font-bold w-10 h-10 rounded-full border-2 border-black flex items-center justify-center text-xl hover:bg-rose-600">×</button>
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-4xl">🥤</span>
+                <h3 class="font-comic text-3xl text-yellow-300">Alternativas ao Copo Descartável</h3>
+            </div>
+            <p class="font-speech text-lg text-slate-200 mb-4">
+                Copos plásticos descartáveis são usados por menos de 5 minutos, mas persistem no ecossistema por mais de 200 anos!
+            </p>
+            <div class="bg-emerald-900/60 border border-emerald-500 rounded-xl p-4 text-emerald-100 mb-4">
+                <h4 class="font-bold mb-1">💡 Solução Sustentável:</h4>
+                <p>Mantenha uma garrafa de inox ou um copo retrátil de silicone na mochila/bolsa. Você economiza centenas de copos por ano!</p>
+            </div>
+            <button onclick="closeModal('modal-copo')" class="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-comic text-xl py-2 rounded-xl border-2 border-black">Entendido!</button>
+        </div>
+    </div>
+
+    <!-- Modal Sacola (Cena 2) -->
+    <div id="modal-sacola" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-slate-800 border-4 border-black rounded-2xl max-w-lg w-full p-6 relative shadow-2xl halftone-bg">
+            <button onclick="closeModal('modal-sacola')" class="absolute top-4 right-4 bg-rose-500 text-white font-bold w-10 h-10 rounded-full border-2 border-black flex items-center justify-center text-xl hover:bg-rose-600">×</button>
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-4xl">🛍️</span>
+                <h3 class="font-comic text-3xl text-yellow-300">O Perigo das Sacolas Plásticas</h3>
+            </div>
+            <p class="font-speech text-lg text-slate-200 mb-4">
+                Sacolas de uso único frequentemente vão parar nos oceanos, onde tartarugas marinhas as confundem com águas-vivas e acabam ingerindo o plástico.
+            </p>
+            <div class="bg-emerald-900/60 border border-emerald-500 rounded-xl p-4 text-emerald-100 mb-4">
+                <h4 class="font-bold mb-1">💡 Solução Sustentável:</h4>
+                <p>Utilize Ecobags de pano ou algodão cru. Uma única sacola reutilizável dura anos e substitui mais de 500 sacolas plásticas!</p>
+            </div>
+            <button onclick="closeModal('modal-sacola')" class="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-comic text-xl py-2 rounded-xl border-2 border-black">Entendido!</button>
+        </div>
+    </div>
+
+    <!-- Modal Delivery (Cena 3) -->
+    <div id="modal-delivery" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-slate-800 border-4 border-black rounded-2xl max-w-lg w-full p-6 relative shadow-2xl halftone-bg">
+            <button onclick="closeModal('modal-delivery')" class="absolute top-4 right-4 bg-rose-500 text-white font-bold w-10 h-10 rounded-full border-2 border-black flex items-center justify-center text-xl hover:bg-rose-600">×</button>
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-4xl">🍱</span>
+                <h3 class="font-comic text-3xl text-yellow-300">Embalagens de Entrega</h3>
+            </div>
+            <p class="font-speech text-lg text-slate-200 mb-4">
+                Muitos aplicativos de entrega enviam talheres de plástico, sachês e copos plásticos desnecessários por padrão.
+            </p>
+            <div class="bg-emerald-900/60 border border-emerald-500 rounded-xl p-4 text-emerald-100 mb-4">
+                <h4 class="font-bold mb-1">💡 Solução Sustentável:</h4>
+                <p>Marque a opção "Dispensa talheres descartáveis" no app e prefira restaurantes que utilizam embalagens biodegradáveis ou de papelão compostável.</p>
+            </div>
+            <button onclick="closeModal('modal-delivery')" class="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-comic text-xl py-2 rounded-xl border-2 border-black">Entendido!</button>
+        </div>
+    </div>
+
+    <!-- Modal Decomposição (Cena 4) -->
+    <div id="modal-decomposicao" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-slate-800 border-4 border-black rounded-2xl max-w-lg w-full p-6 relative shadow-2xl halftone-bg">
+            <button onclick="closeModal('modal-decomposicao')" class="absolute top-4 right-4 bg-rose-500 text-white font-bold w-10 h-10 rounded-full border-2 border-black flex items-center justify-center text-xl hover:bg-rose-600">×</button>
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-4xl">🐢</span>
+                <h3 class="font-comic text-3xl text-yellow-300">Tempo de Decomposição</h3>
+            </div>
+            <p class="font-speech text-lg text-slate-200 mb-4">
+                O plástico não desaparece de verdade; ele se fragmenta em partículas minúsculas chamadas <strong>microplásticos</strong>, que permanecem na natureza por séculos.
+            </p>
+            <div class="bg-emerald-900/60 border border-emerald-500 rounded-xl p-4 text-emerald-100 mb-4">
+                <h4 class="font-bold mb-1">💡 Curiosidade:</h4>
+                <p>Estima-se que cerca de 8 milhões de toneladas de plástico entram nos oceanos todos os anos!</p>
+            </div>
+            <button onclick="closeModal('modal-decomposicao')" class="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-comic text-xl py-2 rounded-xl border-2 border-black">Entendido!</button>
+        </div>
+    </div>
+
+    <!-- Modal Impacto (Cena 5) -->
+    <div id="modal-impacto" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-slate-800 border-4 border-black rounded-2xl max-w-lg w-full p-6 relative shadow-2xl halftone-bg">
+            <button onclick="closeModal('modal-impacto')" class="absolute top-4 right-4 bg-rose-500 text-white font-bold w-10 h-10 rounded-full border-2 border-black flex items-center justify-center text-xl hover:bg-rose-600">×</button>
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-4xl">🌊</span>
+                <h3 class="font-comic text-3xl text-yellow-300">Microplásticos na Cadeia Alimentar</h3>
+            </div>
+            <p class="font-speech text-lg text-slate-200 mb-4">
+                Os microplásticos são ingeridos pelos peixes e acabam retornando ao prato dos seres humanos, fechando um ciclo nocivo para a nossa saúde.
+            </p>
+            <div class="bg-emerald-900/60 border border-emerald-500 rounded-xl p-4 text-emerald-100 mb-4">
+                <h4 class="font-bold mb-1">💡 Solução Sustentável:</h4>
+                <p>Apoie projetos de limpeza de praias/rios e exija políticas públicas voltadas à gestão responsável de resíduos sólidos.</p>
+            </div>
+            <button onclick="closeModal('modal-impacto')" class="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-comic text-xl py-2 rounded-xl border-2 border-black">Entendido!</button>
+        </div>
+    </div>
+
+    <!-- Modal Solução (Cena 6) -->
+    <div id="modal-solucao" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-slate-800 border-4 border-black rounded-2xl max-w-lg w-full p-6 relative shadow-2xl halftone-bg">
+            <button onclick="closeModal('modal-solucao')" class="absolute top-4 right-4 bg-rose-500 text-white font-bold w-10 h-10 rounded-full border-2 border-black flex items-center justify-center text-xl hover:bg-rose-600">×</button>
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-4xl">🌱</span>
+                <h3 class="font-comic text-3xl text-yellow-300">O Poder dos 3 R's</h3>
+            </div>
+            <p class="font-speech text-lg text-slate-200 mb-4">
+                <strong>Reduzir:</strong> O melhor resíduo é aquele que não é gerado.<br>
+                <strong>Reutilizar:</strong> Dê nova vida aos recipientes e objetos.<br>
+                <strong>Reciclar:</strong> Separe o lixo limpo e apoie cooperativas de reciclagem.
+            </p>
+            <button onclick="closeModal('modal-solucao')" class="w-full bg-emerald-400 hover:bg-emerald-300 text-black font-comic text-xl py-2 rounded-xl border-2 border-black">Fazer minha parte!</button>
+        </div>
+    </div>
+
+    <!-- LOGIC & INTERACTION SCRIPTS -->
+    <script>
+        /* Web Audio API Sound Effects Synthesizer */
+        let audioEnabled = false;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function toggleAudio() {
+            initAudio();
+            audioEnabled = !audioEnabled;
+            const soundIcon = document.getElementById('soundIcon');
+            const soundText = document.getElementById('soundText');
+
+            if (audioEnabled) {
+                soundIcon.className = 'fa-solid fa-volume-high text-emerald-400';
+                soundText.innerText = 'Sons: Ligados';
+                playPopSound();
+            } else {
+                soundIcon.className = 'fa-solid fa-volume-xmark text-rose-500';
+                soundText.innerText = 'Sons: Desligados';
+            }
+        }
+
+        function playPopSound() {
+            if (!audioEnabled || !audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        /* Modal Toggle Functions */
+        function openModal(id) {
+            playPopSound();
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeModal(id) {
+            playPopSound();
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        /* Scroll Progress Bar & Animation Observer */
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('scrollProgress').style.width = scrolled + '%';
+        });
+
+        /* Intersection Observer for Panel Animations */
+        const observerOptions = {
+            threshold: 0.25
+        };
+
+        const panelObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('panel-visible');
+                    entry.target.classList.remove('panel-hidden');
+                    playPopSound();
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.comic-panel').forEach(panel => {
+            panelObserver.observe(panel);
+        });
+
+        /* Calculator Logic */
+        function calcularPegada() {
+            const copos = parseInt(document.getElementById('calc-copos').value) || 0;
+            const sacolas = parseInt(document.getElementById('calc-sacolas').value) || 0;
+            const delivery = parseInt(document.getElementById('calc-delivery').value) || 0;
+
+            const totalSemanal = copos + sacolas + (delivery * 3); // ~3 itens por embalagem delivery
+            const totalAnual = totalSemanal * 52;
+            const pesoKg = (totalAnual * 0.008).toFixed(1); // Média de ~8g por item plástico
+
+            document.getElementById('res-total-itens').innerText = totalAnual.toLocaleString();
+            document.getElementById('res-peso-kg').innerText = pesoKg + ' kg';
+
+            const msg = document.getElementById('res-mensagem');
+            if (totalAnual > 1000) {
+                msg.innerText = '⚠️ Sua pegada é alta! Tente adotar garrafas reutilizáveis e ecobags para reduzir drasticamente esse número.';
+            } else if (totalAnual > 400) {
+                msg.innerText = '🌱 Bom começo! Pequenas mudanças nos hábitos semanais podem reduzir seu impacto pela metade.';
+            } else {
+                msg.innerText = '🌟 Excelente! Você mantém uma pegada de plástico descartável bem reduzida!';
+            }
+        }
+
+        /* Mini-Quiz Logic */
+        const quizQuestions = [
+            {
+                q: "Quanto tempo um copo plástico descartável pode levar para se decompor na natureza?",
+                options: ["Até 10 anos", "Cerca de 50 anos", "Até 400 anos", "Não se decompõe"],
+                correct: 2
+            },
+            {
+                q: "Qual destas atitudes substitui o uso de dezenas de sacolas de supermercado por ano?",
+                options: ["Usar sacola plástica dupla", "Levar uma Ecobag reutilizável", "Queimar as sacolas", "Usar sacolas menores"],
+                correct: 1
+            },
+            {
+                q: "O que são microplásticos?",
+                options: [
+                    "Plásticos biodegradáveis de milho",
+                    "Pedaços minúsculos de plástico que contaminam rios e oceanos",
+                    "Embalagens reutilizáveis",
+                    "Lixo recolhido na reciclagem"
+                ],
+                correct: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        function loadQuizStep() {
+            if (currentQuestion >= quizQuestions.length) {
+                showQuizResult();
+                return;
+            }
+
+            const qData = quizQuestions[currentQuestion];
+            document.getElementById('quiz-progress-text').innerText = `Pergunta ${currentQuestion + 1} de ${quizQuestions.length}`;
+            document.getElementById('quiz-score-badge').innerText = `Pontos: ${score}`;
+            document.getElementById('quiz-question').innerText = qData.q;
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left bg-slate-900 hover:bg-slate-700 text-white p-4 rounded-xl border-2 border-black font-bold transition flex items-center justify-between";
+                btn.innerHTML = `<span>${opt}</span> <i class="fa-solid fa-chevron-right text-yellow-400"></i>`;
+                btn.onclick = () => answerQuiz(idx);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function answerQuiz(selectedIdx) {
+            playPopSound();
+            if (selectedIdx === quizQuestions[currentQuestion].correct) {
+                score += 100;
+            }
+            currentQuestion++;
+            loadQuizStep();
+        }
+
+        function showQuizResult() {
+            document.getElementById('quiz-step').classList.add('hidden');
+            const resultBox = document.getElementById('quiz-result');
+            resultBox.classList.remove('hidden');
+
+            const rankBadge = document.getElementById('quiz-rank');
+            const rankDesc = document.getElementById('quiz-final-desc');
+
+            if (score >= 300) {
+                rankBadge.innerText = "🛡️ GUARDIÃO DOS OCEANOS";
+                rankDesc.innerText = "Parabéns! Você acertou todas as perguntas e é um verdadeiro especialista em sustentabilidade!";
+            } else if (score >= 200) {
+                rankBadge.innerText = "🌱 HERÓI SEM PLÁSTICO";
+                rankDesc.innerText = "Ótimo trabalho! Você demonstra uma excelente conscientização sobre o uso de descartáveis.";
+            } else {
+                rankBadge.innerText = "🔍 APRENDIZ ECOLÓGICO";
+                rankDesc.innerText = "Você está no caminho certo! Continue aprendendo para proteger nossos mares e rios.";
+            }
+        }
+
+        function reiniciarQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('quiz-result').classList.add('hidden');
+            document.getElementById('quiz-step').classList.remove('hidden');
+            loadQuizStep();
+        }
+
+        function compartilharCertificado() {
+            playPopSound();
+            const textToCopy = "Eu conquistei o título no quiz 'Menos Plástico, Mais Vida'! Faça sua parte você também reduzindo o plástico descartável! 🌊🌱";
+            
+            // Clipboard copy with fallback
+            const tempInput = document.createElement('textarea');
+            tempInput.value = textToCopy;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            alert("Certificado e mensagem copiados para a área de transferência! Compartilhe com seus amigos nas redes sociais!");
+        }
+
+        /* Commitment Mural Signature Logic */
+        let commitmentCount = 1248;
+
+        function assinarCompromisso(e) {
+            e.preventDefault();
+            playPopSound();
+            const inputNome = document.getElementById('input-nome');
+            const nome = inputNome.value.trim();
+
+            if (nome) {
+                commitmentCount++;
+                document.getElementById('counter-commitments').innerText = commitmentCount.toLocaleString();
+
+                const recentContainer = document.getElementById('recent-names');
+                const newTag = document.createElement('span');
+                newTag.className = "bg-yellow-400 text-black px-3 py-1 rounded-full text-xs font-bold border border-black animate-pulse";
+                newTag.innerText = `${nome} 💚`;
+                recentContainer.prepend(newTag);
+
+                inputNome.value = '';
+                alert(`Obrigado, ${nome}! Seu compromisso com o planeta foi registrado com sucesso! 🌱`);
+            }
+        }
+
+        // Initialize calculations & quiz on window load
+        window.onload = function() {
+            calcularPegada();
+            loadQuizStep();
+        };
+    </script>
+</body>
+</html>
