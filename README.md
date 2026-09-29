@@ -1,1 +1,0 @@
-# Trabalho-Sustentabilidade-Descarte-dos-lixos
